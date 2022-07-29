@@ -82,6 +82,12 @@ type Props = {
    */
   fabStyle?: StyleProp<ViewStyle>;
   /**
+   * @supported Available in v5.x
+   *
+   * Custom size for the `FAB`. This prop takes precedence over size prop
+   */
+  customSize?: number;
+  /**
    * @supported Available in v5.x with theme version 3
    *
    * Color mappings variant for combinations of container and icon colors.
@@ -165,6 +171,7 @@ const FABGroup = ({
   theme,
   style,
   fabStyle,
+  customSize,
   visible,
   testID,
   onStateChange,
@@ -180,14 +187,14 @@ const FABGroup = ({
 
   const [prevActions, setPrevActions] = React.useState<
     | {
-        icon: IconSource;
-        label?: string;
-        color?: string;
-        accessibilityLabel?: string;
-        style?: StyleProp<ViewStyle>;
-        onPress: () => void;
-        testID?: string;
-      }[]
+      icon: IconSource;
+      label?: string;
+      color?: string;
+      accessibilityLabel?: string;
+      style?: StyleProp<ViewStyle>;
+      onPress: () => void;
+      testID?: string;
+    }[]
     | null
   >(null);
 
@@ -242,35 +249,35 @@ const FABGroup = ({
 
   const backdropOpacity = open
     ? backdrop.interpolate({
-        inputRange: [0, 0.5, 1],
-        outputRange: [0, 1, 1],
-      })
+      inputRange: [0, 0.5, 1],
+      outputRange: [0, 1, 1],
+    })
     : backdrop;
 
   const opacities = animations.current;
   const scales = opacities.map((opacity) =>
     open
       ? opacity.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0.5, 1],
-        })
+        inputRange: [0, 1],
+        outputRange: [0.5, 1],
+      })
       : 1
   );
 
   const translations = opacities.map((opacity) =>
     open
       ? opacity.interpolate({
-          inputRange: [0, 1],
-          outputRange: [24, -8],
-        })
+        inputRange: [0, 1],
+        outputRange: [24, -8],
+      })
       : -8
   );
   const labelTranslations = opacities.map((opacity) =>
     open
       ? opacity.interpolate({
-          inputRange: [0, 1],
-          outputRange: [8, -8],
-        })
+        inputRange: [0, 1],
+        outputRange: [8, -8],
+      })
       : -8
   );
 
