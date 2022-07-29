@@ -395,6 +395,7 @@ const FABGroup = ({
           visible={visible}
           testID={testID}
           variant={variant}
+          customSize={customSize ?? null}
         />
       </SafeAreaView>
     </View>
