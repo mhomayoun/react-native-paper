@@ -42,6 +42,7 @@ function getPages() {
     .split('\n')
     .map((line) => line.split(' ').pop().replace(/('|;)/g, ''))
     .filter((line) => line.startsWith('./components/'))
+    .filter((line) => !line.includes('v2'))
     .map((line) => {
       const file = require.resolve(path.join(__dirname, '../src', line));
       if (/\/index\.(js|tsx?)$/.test(file)) {
@@ -127,5 +128,14 @@ module.exports = {
       deprecated: '#B00020',
       renamed: '#006400',
     },
+  },
+  typeDefinitions: {
+    IconSource: 'https://callstack.github.io/react-native-paper/icons.html',
+    Theme:
+      'https://callstack.github.io/react-native-paper/theming.html#theme-properties',
+    AccessibilityState:
+      'https://reactnative.dev/docs/accessibility#accessibilitystate',
+    'StyleProp<ViewStyle>': 'https://reactnative.dev/docs/view-style-props',
+    'StyleProp<TextStyle>': 'https://reactnative.dev/docs/text-style-props',
   },
 };

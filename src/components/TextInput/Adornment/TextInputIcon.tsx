@@ -13,9 +13,10 @@ export type Props = $Omit<
   'icon' | 'theme' | 'color'
 > & {
   /**
+   * @renamed Renamed from 'name' to 'icon` in v5.x
    * Icon to show.
    */
-  name: IconSource;
+  icon: IconSource;
   /**
    * Function to execute on press.
    */
@@ -39,12 +40,14 @@ type StyleContextType = {
   style: StyleProp<ViewStyle>;
   isTextInputFocused: boolean;
   forceFocus: () => void;
+  testID: string;
 };
 
 const StyleContext = React.createContext<StyleContextType>({
   style: {},
   isTextInputFocused: false,
   forceFocus: () => {},
+  testID: '',
 });
 
 const IconAdornment: React.FunctionComponent<
@@ -54,7 +57,7 @@ const IconAdornment: React.FunctionComponent<
     topPosition: number;
     side: 'left' | 'right';
   } & Omit<StyleContextType, 'style'>
-> = ({ icon, topPosition, side, isTextInputFocused, forceFocus }) => {
+> = ({ icon, topPosition, side, isTextInputFocused, forceFocus, testID }) => {
   const { isV3 } = useTheme();
   const { ICON_OFFSET } = getConstants(isV3);
 
@@ -62,7 +65,7 @@ const IconAdornment: React.FunctionComponent<
     top: topPosition,
     [side]: ICON_OFFSET,
   };
-  const contextState = { style, isTextInputFocused, forceFocus };
+  const contextState = { style, isTextInputFocused, forceFocus, testID };
 
   return (
     <StyleContext.Provider value={contextState}>{icon}</StyleContext.Provider>
@@ -90,7 +93,7 @@ const IconAdornment: React.FunctionComponent<
  *     <TextInput
  *       label="Password"
  *       secureTextEntry
- *       right={<TextInput.Icon name="eye" />}
+ *       right={<TextInput.Icon icon="eye" />}
  *     />
  *   );
  * };
@@ -100,13 +103,13 @@ const IconAdornment: React.FunctionComponent<
  */
 
 const TextInputIcon = ({
-  name,
+  icon,
   onPress,
   forceTextInputFocus,
   color,
   ...rest
 }: Props) => {
-  const { style, isTextInputFocused, forceFocus } =
+  const { style, isTextInputFocused, forceFocus, testID } =
     React.useContext(StyleContext);
 
   const onPressWithFocusControl = React.useCallback(() => {
@@ -132,13 +135,14 @@ const TextInputIcon = ({
   return (
     <View style={[styles.container, style]}>
       <IconButton
-        icon={name}
+        icon={icon}
         style={styles.iconButton}
         size={ICON_SIZE}
         onPress={onPressWithFocusControl}
         iconColor={
           typeof color === 'function' ? color(isTextInputFocused) : iconColor
         }
+        testID={testID}
         {...rest}
       />
     </View>

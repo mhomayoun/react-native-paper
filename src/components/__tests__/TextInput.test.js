@@ -1,7 +1,7 @@
 import * as React from 'react';
 import color from 'color';
-import { StyleSheet, Text, Platform } from 'react-native';
-import { fireEvent, render } from 'react-native-testing-library';
+import { StyleSheet, Text, Platform, I18nManager } from 'react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 import TextInput from '../TextInput/TextInput';
 import { red500 } from '../../styles/themes/v2/colors';
 import {
@@ -33,7 +33,7 @@ it('correctly renders left-side icon adornment, and right-side affix adornment',
       onChangeText={(text) => this.setState({ text })}
       left={
         <TextInput.Icon
-          name="heart"
+          icon="heart"
           onPress={() => {
             console.log('!@# press left');
           }}
@@ -44,9 +44,9 @@ it('correctly renders left-side icon adornment, and right-side affix adornment',
       }
     />
   );
-  expect(() => getByText(affixTextValue)).not.toThrow();
-  expect(() => getByTestId('left-icon-adornment')).not.toThrow();
-  expect(() => getByTestId('right-affix-adornment')).not.toThrow();
+  expect(getByText(affixTextValue)).toBeTruthy();
+  expect(getByTestId('left-icon-adornment')).toBeTruthy();
+  expect(getByTestId('right-affix-adornment')).toBeTruthy();
   expect(toJSON()).toMatchSnapshot();
 });
 
@@ -62,7 +62,7 @@ it('correctly renders left-side icon adornment, and right-side affix adornment '
       }
       right={
         <TextInput.Icon
-          name="heart"
+          icon="heart"
           onPress={() => {
             console.log('!@# press left');
           }}
@@ -70,9 +70,9 @@ it('correctly renders left-side icon adornment, and right-side affix adornment '
       }
     />
   );
-  expect(() => getByText(affixTextValue)).not.toThrow();
-  expect(() => getByTestId('right-icon-adornment')).not.toThrow();
-  expect(() => getByTestId('left-affix-adornment')).not.toThrow();
+  expect(getByText(affixTextValue)).toBeTruthy();
+  expect(getByTestId('right-icon-adornment')).toBeTruthy();
+  expect(getByTestId('left-affix-adornment')).toBeTruthy();
   expect(toJSON()).toMatchSnapshot();
 });
 
@@ -128,9 +128,7 @@ it('correctly applies error state Outline TextInput', () => {
   );
 
   const outline = getByTestId('text-input-outline');
-  expect(outline.props.style).toEqual(
-    expect.arrayContaining([expect.objectContaining({ borderWidth: 2 })])
-  );
+  expect(outline).toHaveStyle({ borderWidth: 2 });
 });
 
 it('correctly applies focused state Outline TextInput', () => {
@@ -145,15 +143,11 @@ it('correctly applies focused state Outline TextInput', () => {
   );
 
   const outline = getByTestId('text-input-outline');
-  expect(outline.props.style).toEqual(
-    expect.arrayContaining([expect.objectContaining({ borderWidth: 2 })])
-  );
+  expect(outline).toHaveStyle({ borderWidth: 2 });
 
   fireEvent(getByTestId('text-input-outlined'), 'focus');
 
-  expect(outline.props.style).toEqual(
-    expect.arrayContaining([expect.objectContaining({ borderWidth: 2 })])
-  );
+  expect(outline).toHaveStyle({ borderWidth: 2 });
 });
 
 it('contains patch spacing for flat input when ios and multiline', () => {
@@ -167,7 +161,7 @@ it('contains patch spacing for flat input when ios and multiline', () => {
       onChangeText={(text) => this.setState({ text })}
     />
   );
-  expect(() => getByTestId('patch-container')).not.toThrow();
+  expect(getByTestId('patch-container')).toBeTruthy();
 });
 
 it('correctly applies a component as the text label', () => {
@@ -180,6 +174,97 @@ it('correctly applies a component as the text label', () => {
   );
 
   expect(toJSON()).toMatchSnapshot();
+});
+
+it('renders label with correct color when active', () => {
+  const { getByTestId } = render(
+    <TextInput
+      label="Flat input"
+      placeholder="Type something"
+      value={'Some test value'}
+      onChangeText={(text) => this.setState({ text })}
+      testID={'text-input'}
+    />
+  );
+
+  fireEvent(getByTestId('text-input-flat'), 'focus');
+
+  expect(getByTestId('text-input-label-active')).toHaveStyle({
+    color: getTheme().colors.primary,
+  });
+});
+
+it('renders label with correct color when inactive', () => {
+  const { getByTestId } = render(
+    <TextInput
+      label="Flat input"
+      placeholder="Type something"
+      value={'Some test value'}
+      onChangeText={(text) => this.setState({ text })}
+      testID={'text-input'}
+    />
+  );
+
+  expect(getByTestId('text-input-label-inactive')).toHaveStyle({
+    color: getTheme().colors.onSurfaceVariant,
+  });
+});
+
+it('renders input placeholder initially with an empty space character', () => {
+  const { getByTestId } = render(
+    <TextInput multiline label="Multiline input" testID={'text-input'} />
+  );
+
+  expect(getByTestId('text-input-flat').props.placeholder).toBe(' ');
+});
+
+it('correctly applies padding offset to input label on Android when RTL', () => {
+  Platform.OS = 'android';
+  I18nManager.isRTL = true;
+
+  const { getByTestId } = render(
+    <TextInput
+      label="Flat input"
+      mode="flat"
+      testID="text-input-flat"
+      left={
+        <TextInput.Affix text={affixTextValue} textStyle={style.inputStyle} />
+      }
+      right={
+        <TextInput.Affix text={affixTextValue} textStyle={style.inputStyle} />
+      }
+    />
+  );
+
+  expect(getByTestId('text-input-flat-label-active')).toHaveStyle({
+    paddingLeft: 56,
+    paddingRight: 16,
+  });
+
+  I18nManager.isRTL = false;
+});
+
+it('correctly applies padding offset to input label on Android when LTR', () => {
+  Platform.OS = 'android';
+
+  const { getByTestId } = render(
+    <TextInput
+      label="Flat input"
+      mode="flat"
+      testID="text-input-flat"
+      left={
+        <TextInput.Affix text={affixTextValue} textStyle={style.inputStyle} />
+      }
+      right={
+        <TextInput.Affix text={affixTextValue} textStyle={style.inputStyle} />
+      }
+    />
+  );
+
+  expect(getByTestId('text-input-flat-label-active')).toHaveStyle({
+    paddingLeft: 16,
+    paddingRight: 56,
+  });
 });
 
 describe('maxFontSizeMultiplier', () => {

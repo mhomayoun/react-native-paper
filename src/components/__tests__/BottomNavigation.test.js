@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { StyleSheet, Easing, Animated } from 'react-native';
-import { fireEvent, render } from 'react-native-testing-library';
+import { StyleSheet, Easing, Animated, Platform } from 'react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 import renderer from 'react-test-renderer';
 import BottomNavigation from '../BottomNavigation/BottomNavigation.tsx';
 import BottomNavigationRouteScreen from '../BottomNavigation/BottomNavigationRouteScreen.tsx';
@@ -283,22 +283,22 @@ it('hides labels in non-shifting bottom navigation', () => {
   expect(tree).toMatchSnapshot();
 });
 
-it('should have appropriate display style according to the visibility', () => {
+it('should have appropriate display style according to the visibility on web', () => {
+  const originalPlatform = Platform.OS;
+  Platform.OS = 'web';
+
   const { getByTestId, rerender } = render(
     <BottomNavigationRouteScreen visibility={1} index={0} />
   );
 
   const wrapper = getByTestId('RouteScreen: 0');
 
-  expect(wrapper.props.style).toEqual(
-    expect.arrayContaining([expect.objectContaining({ display: 'flex' })])
-  );
+  expect(wrapper).toHaveStyle({ display: 'flex' });
 
   rerender(<BottomNavigationRouteScreen visibility={0} index={0} />);
+  expect(wrapper).toHaveStyle({ display: 'none' });
 
-  expect(wrapper.props.style).toEqual(
-    expect.arrayContaining([expect.objectContaining({ display: 'none' })])
-  );
+  Platform.OS = originalPlatform;
 });
 
 it('should have labelMaxFontSizeMultiplier passed to label', () => {
@@ -333,9 +333,5 @@ it('renders custom background color passed to barStyle property', () => {
   );
 
   const wrapper = getByTestId('bottom-navigation-bar-content');
-  expect(wrapper.props.style).toEqual(
-    expect.arrayContaining([
-      expect.objectContaining({ backgroundColor: red300 }),
-    ])
-  );
+  expect(wrapper).toHaveStyle({ backgroundColor: red300 });
 });

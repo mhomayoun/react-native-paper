@@ -69,6 +69,7 @@ const TextInputFlat = ({
   left,
   right,
   placeholderTextColor,
+  testID = 'text-input',
   ...rest
 }: ChildTextInputProps) => {
   const isAndroid = Platform.OS === 'android';
@@ -251,13 +252,19 @@ const TextInputFlat = ({
     labelScale,
     wiggleOffsetX: LABEL_WIGGLE_X_OFFSET,
     topPosition,
-    paddingOffset: { paddingLeft, paddingRight },
+    paddingOffset: isAndroid
+      ? {
+          paddingLeft: I18nManager.isRTL ? paddingRight : paddingLeft,
+          paddingRight: I18nManager.isRTL ? paddingLeft : paddingRight,
+        }
+      : { paddingRight, paddingLeft },
     hasActiveOutline,
     activeColor,
     placeholderColor,
     errorColor,
     roundness,
     maxFontSizeMultiplier: rest.maxFontSizeMultiplier,
+    testID,
   };
   const affixTopPosition = {
     [AdornmentSide.Left]: leftAffixTopPosition,
@@ -328,7 +335,7 @@ const TextInputFlat = ({
         )}
         <InputLabel parentState={parentState} labelProps={labelProps} />
         {render?.({
-          testID: 'text-input-flat',
+          testID: `${testID}-flat`,
           ...rest,
           ref: innerRef,
           onChangeText,
